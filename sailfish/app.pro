@@ -4,7 +4,7 @@ CONFIG += sailfishapp
 QT += dbus concurrent
 
 isEmpty(VERSION) {
-    VERSION = 0.2.1
+    VERSION = 0.2.2
 }
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += NETZDIENST=\\\"/usr/libexec/wienzufuss/wzf-dienst\\\"

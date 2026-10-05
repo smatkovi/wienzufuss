@@ -1,7 +1,7 @@
 Name:       wienzufuss
 
 Summary:    Wien zu Fuß: Schritte zählen, Ranking, Challenges, Gutscheine (inoffiziell)
-Version:    0.2.1
+Version:    0.2.2
 Release:    1
 License:    GPLv3
 URL:        https://github.com/smatkovi/wienzufuss
@@ -42,11 +42,25 @@ install -D -m 644 wienzufuss-schritte.service %{buildroot}/usr/lib/systemd/user/
 mkdir -p %{buildroot}/usr/lib/systemd/user/user-session.target.wants
 ln -s ../wienzufuss-schritte.service %{buildroot}/usr/lib/systemd/user/user-session.target.wants/wienzufuss-schritte.service
 install -D -m 644 org.smatkovi.WienZuFuss.Schritte.service %{buildroot}%{_datadir}/dbus-1/services/org.smatkovi.WienZuFuss.Schritte.service
+# Wird in %post nach /etc/sensorfw/sensord.conf.d kopiert, wenn das Geraet
+# einen Schrittzaehler hat, den sensorfw ausblendet.
+install -D -m 644 sensorfw/90-wienzufuss-schrittzaehler.conf %{buildroot}%{_datadir}/%{name}/sensorfw/90-wienzufuss-schrittzaehler.conf
 desktop-file-install --delete-original \
   --dir %{buildroot}%{_datadir}/applications \
   %{buildroot}%{_datadir}/applications/*.desktop
 
 %post
+# Hardware-Schrittzaehler freischalten: nur, wenn der Android-Unterbau einen
+# meldet und sensorfw keinen Adapter dafuer eingetragen hat (Jolla Phone
+# 2026). Beim Entfernen der App kommt die Datei wieder weg.
+SFW=/etc/sensorfw/sensord.conf.d/90-wienzufuss-schrittzaehler.conf
+if [ ! -e "$SFW" ] && [ -d /etc/sensorfw/sensord.conf.d ] \
+   && ! grep -qs '^ *stepcounteradaptor *=' /etc/sensorfw/*.conf /etc/sensorfw/sensord.conf.d/*.conf \
+   && grep -qs 'android.hardware.sensor.stepcounter"' /vendor/etc/permissions/*.xml \
+        /odm/etc/permissions/*.xml /system/vendor/etc/permissions/*.xml /system/etc/permissions/*.xml; then
+    cp %{_datadir}/%{name}/sensorfw/90-wienzufuss-schrittzaehler.conf "$SFW" \
+        && systemctl try-restart sensorfwd.service >/dev/null 2>&1 || :
+fi
 systemctl-user daemon-reload >/dev/null 2>&1 || :
 systemctl-user try-restart wienzufuss-schritte.service >/dev/null 2>&1 || :
 systemctl-user start wienzufuss-schritte.service >/dev/null 2>&1 || :
@@ -57,6 +71,10 @@ if [ "$1" -eq 0 ]; then
 fi
 
 %postun
+if [ "$1" -eq 0 ] && [ -e /etc/sensorfw/sensord.conf.d/90-wienzufuss-schrittzaehler.conf ]; then
+    rm -f /etc/sensorfw/sensord.conf.d/90-wienzufuss-schrittzaehler.conf
+    systemctl try-restart sensorfwd.service >/dev/null 2>&1 || :
+fi
 systemctl-user daemon-reload >/dev/null 2>&1 || :
 
 %files

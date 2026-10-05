@@ -88,7 +88,9 @@ bool Hardwarezaehler::starten()
                  !standby.isValid() ? standby.error().message().toUtf8().constData()
                                     : (standby.value() ? "ja" : "nein"));
     s->call(QLatin1String("start"), m_sitzung);
-    if (lesen() < 0) {
+    // KEIN_WERT ist in Ordnung: der Sensor antwortet, hat nur noch nichts
+    // gemeldet (am Jolla Phone 2026 bis zum ersten Schritt).
+    if (lesen() == -1) {
         m_fehler = QString::fromUtf8("Schrittzähler liefert keinen Stand");
         stoppen();
         return false;
@@ -131,6 +133,11 @@ qint64 Hardwarezaehler::lesen()
     arg.beginStructure();
     arg >> zeit >> wert;
     arg.endStructure();
+    // Zeitstempel 0: seit dem Einschalten noch keine Meldung. Als Stand
+    // genommen, kaeme die erste echte Meldung (Schritte seit Boot) auf
+    // einen Schlag als heute gegangen dazu.
+    if (zeit == 0)
+        return KEIN_WERT;
     return qint64(wert);
 }
 
@@ -158,9 +165,13 @@ void Hardwarezaehler::socketLesen()
         const int laenge = 4 + int(n) * 16;
         if (m_puffer.size() < laenge)
             break;
+        const char *rahmen = m_puffer.constData() + 4 + (int(n) - 1) * 16;
+        quint64 zeit = 0;
         quint32 wert = 0;
-        std::memcpy(&wert, m_puffer.constData() + 4 + (int(n) - 1) * 16 + 8, 4);
-        letzter = wert;
+        std::memcpy(&zeit, rahmen, 8);
+        std::memcpy(&wert, rahmen + 8, 4);
+        if (zeit != 0)
+            letzter = wert;
         m_puffer.remove(0, laenge);
     }
     if (letzter >= 0)

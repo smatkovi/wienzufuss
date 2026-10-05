@@ -74,7 +74,7 @@ class Steuerung : public QObject
 public:
     Steuerung(Schrittdienst *d)
         : m_dienst(d), m_hw(new Hardwarezaehler(this)), m_sensor(0), m_filter(d),
-          m_wecker(new BackgroundActivity(this)), m_wach(new BackgroundActivity(this))
+          m_wecker(new BackgroundActivity(this)), m_wach(new BackgroundActivity(this)), m_versuche(0)
     {
         m_filter.m_steuerung = this;
         connect(m_hw, SIGNAL(stand(qint64)), this, SLOT(hwStand(qint64)));
@@ -100,6 +100,7 @@ public slots:
             return;
         }
         if (m_hw->laeuft() || m_hw->starten()) {
+            m_versuche = 0;
             beschleunigungAus();
             m_dienst->setQuelle(QLatin1String("hardware"), QString());
             hwLesen();
@@ -109,11 +110,18 @@ public slots:
         }
         const QString warum = m_hw->fehler();
         m_wecker->stop();
+        // Vielleicht laeuft sensorfwd gerade erst an (die Installation
+        // startet ihn neu, wenn sie den Zaehler freischaltet): ein paar Mal
+        // nachfassen.
+        if (m_versuche < 5) {
+            ++m_versuche;
+            QTimer::singleShot(30000, this, SLOT(anwenden()));
+        }
         if (!e.beschleunigung) {
             beschleunigungAus();
             m_dienst->setQuelle(QLatin1String("keine"),
-                                warum + QLatin1String(". Der Beschleunigungssensor ist als Ersatz möglich, "
-                                                      "braucht aber mehr Akku (Einstellungen)."));
+                                warum + QString::fromUtf8(". Der Beschleunigungssensor ist als Ersatz möglich, "
+                                                          "braucht aber mehr Akku (Einstellungen)."));
             return;
         }
         beschleunigungAn();
@@ -198,6 +206,7 @@ private:
     Beschleunigung m_filter;
     BackgroundActivity *m_wecker;
     BackgroundActivity *m_wach;
+    int m_versuche;
 };
 
 int main(int argc, char *argv[])

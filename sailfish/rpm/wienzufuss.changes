@@ -1,3 +1,14 @@
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.2.2-1
+- Hardware-Schrittzaehler am Jolla Phone 2026: der Android-Unterbau hat
+  einen, sensorfw blendet ihn aus. Das RPM schaltet ihn frei (Datei in
+  /etc/sensorfw/sensord.conf.d, nur wenn das Geraet einen meldet; beim
+  Entfernen wieder weg).
+- Ein Zaehler, der seit dem Einschalten noch nichts gemeldet hat
+  (Zeitstempel 0), setzt keinen Ausgangsstand mehr; sonst kaemen mit der
+  ersten Meldung alle Schritte seit Boot auf heute.
+- Startet sensorfwd gerade neu, versucht es der Schrittdienst noch einmal.
+- Hinweistext ohne kaputten Umlaut; Symbol in Harmattan-Form (Squircle).
+
 * Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.2.1-1
 - QR-Code im Lokal scannen wie in der Android-App (Rahmen, "Code
   einloesen?"). Leser aus dem Briar-Port: quirc; Sailfish mit dem

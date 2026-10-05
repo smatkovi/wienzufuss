@@ -12,7 +12,7 @@
 
 Ausgabe:
   meego/icons/icon-80.png, icon-64.png   N9: in Harmattan-Form (Superellipse)
-  sailfish/icons/<n>x<n>/wienzufuss.png  Sailfish: abgerundetes Quadrat
+  sailfish/icons/<n>x<n>/wienzufuss.png  Sailfish: dieselbe Form
 """
 import math
 import os
@@ -131,21 +131,25 @@ def eigenes_logo(ziel_png):
     bild.resize((512, 512), Image.LANCZOS).save(ziel_png)
 
 
-def harmattan_maske(g=80):
+def squircle_maske(g):
     """Die Form der Harmattan-Symbole: Superellipse (Exponent ~2,7) mit 1 px
-    Rand -- nachgerechnet, nicht aus dem Nokia-Thema kopiert."""
+    Rand -- nachgerechnet, nicht aus dem Nokia-Thema kopiert. Sailfish
+    bekommt dieselbe Form. Gerechnet wird achtfach und zeilenweise: je
+    Zeile liegt die Form zwischen zwei Grenzen, die sich ausrechnen lassen."""
     f = 8
     m = Image.new("L", (g * f, g * f), 0)
-    px = m.load()
+    d = ImageDraw.Draw(m)
     halb = (g - 2) * f / 2.0
     mitte = g * f / 2.0
     for y in range(g * f):
         v = abs((y + 0.5 - mitte) / halb) ** 2.7
         if v > 1.0:
             continue
-        for x in range(g * f):
-            if abs((x + 0.5 - mitte) / halb) ** 2.7 + v <= 1.0:
-                px[x, y] = 255
+        w = halb * (1.0 - v) ** (1 / 2.7)
+        links = math.ceil(mitte - w - 0.5)
+        rechts = math.floor(mitte + w - 0.5)
+        if rechts >= links:
+            d.line([(links, y), (rechts, y)], fill=255)
     return m.resize((g, g), Image.LANCZOS)
 
 
@@ -161,20 +165,16 @@ def main():
 
         # N9
         bild = quelle.resize((80, 80), Image.LANCZOS)
-        bild.putalpha(harmattan_maske(80))
+        bild.putalpha(squircle_maske(80))
         ordner = os.path.join(WURZEL, "meego", "icons")
         os.makedirs(ordner, exist_ok=True)
         bild.save(os.path.join(ordner, "icon-80.png"))
         bild.resize((64, 64), Image.LANCZOS).save(os.path.join(ordner, "icon-64.png"))
 
-        # Sailfish
+        # Sailfish: dieselbe Form wie am N9
         for g in (86, 108, 128, 172):
-            f = 4
-            m = Image.new("L", (g * f, g * f), 0)
-            ImageDraw.Draw(m).rounded_rectangle([0, 0, g * f - 1, g * f - 1], radius=int(g * f * 0.18), fill=255)
-            m = m.resize((g, g), Image.LANCZOS)
             b = quelle.resize((g, g), Image.LANCZOS)
-            b.putalpha(m)
+            b.putalpha(squircle_maske(g))
             ziel = os.path.join(WURZEL, "sailfish", "icons", "%dx%d" % (g, g))
             os.makedirs(ziel, exist_ok=True)
             b.save(os.path.join(ziel, "wienzufuss.png"))

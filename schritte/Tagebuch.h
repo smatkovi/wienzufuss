@@ -4,7 +4,7 @@
 // Die Tagessummen der gezaehlten Schritte, in
 // ~/.local/share/wienzufuss/schritte.json:
 //
-//   {"version":1,"quelle":"hardware","hinweis":"","stand":"2026-10-05 14:03:00",
+//   {"version":2,"quelle":"hardware","hinweis":"","stand":"2026-10-05 14:03:00",
 //    "hw":{"letzter":12345,"boot":"<boot_id>"},
 //    "tage":{"2026-10-04":8123,"2026-10-05":312}}
 //

@@ -1,6 +1,6 @@
 [package]
 name = "wzf-dienst"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 
 # Die Netzseite von Wien zu Fuss fuer MeeGo Harmattan und Sailfish OS:

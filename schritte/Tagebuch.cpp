@@ -82,6 +82,12 @@ void Tagebuch::laden()
     hwBoot = textFeld(json, "boot");
     QRegExp letzter(QLatin1String("\"letzter\"\\s*:\\s*(-?\\d+)"));
     hwLetzter = letzter.indexIn(json) >= 0 ? letzter.cap(1).toLongLong() : -1;
+    // Bis 0.2.1 konnte ein noch stummer Hardware-Zaehler den Stand 0
+    // hinterlassen; die erste echte Meldung haette dann alle Schritte seit
+    // Boot auf heute gebucht. Einen solchen Stand verwerfen.
+    QRegExp version(QLatin1String("\"version\"\\s*:\\s*(\\d+)"));
+    if ((version.indexIn(json) < 0 || version.cap(1).toInt() < 2) && hwLetzter == 0)
+        hwLetzter = -1;
 }
 
 void Tagebuch::kuerzen()
@@ -117,7 +123,7 @@ int Tagebuch::heute() const
 bool Tagebuch::sichern()
 {
     kuerzen();
-    QString aus = QLatin1String("{\"version\":1,\"quelle\":") + zeichenkette(quelle)
+    QString aus = QLatin1String("{\"version\":2,\"quelle\":") + zeichenkette(quelle)
             + QLatin1String(",\"hinweis\":") + zeichenkette(hinweis)
             + QLatin1String(",\"stand\":") + zeichenkette(jetztText())
             + QLatin1String(",\"hw\":{\"letzter\":") + QString::number(hwLetzter)

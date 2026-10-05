@@ -3,7 +3,7 @@
 //! Gezaehlt wird vom Schrittdienst (wzf-schritte); er schreibt Tagessummen
 //! nach ~/.local/share/wienzufuss/schritte.json:
 //!
-//!   {"version":1, "quelle":"hardware", "tage":{"2026-10-05":8123, ...}, ...}
+//!   {"version":2, "quelle":"hardware", "tage":{"2026-10-05":8123, ...}, ...}
 //!
 //! Hochgeladen werden Tagessummen wie bei der Android-App
 //! (`POST v1/user/health`). Ob der Server je Datum ersetzt oder addiert, ist

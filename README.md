@@ -42,6 +42,13 @@ Client, mit eigener Schrittzählung. Die Schnittstelle steht in
     Bietet das Gerät keinen an, zählt er auf Wunsch mit dem
     Beschleunigungssensor (kostet Akku, weil das Telefon dann wach bleibt).
     systemd-Benutzerdienst `wienzufuss-schritte.service`.
+    Manche Geräte haben den Zähler im Android-Unterbau, sensorfw blendet ihn
+    aber aus (Jolla Phone 2026: `stepcountersensor=False`, kein Adapter
+    eingetragen). Dann legt das RPM
+    `/etc/sensorfw/sensord.conf.d/90-wienzufuss-schrittzaehler.conf` an
+    (`sailfish/sensorfw/`) und startet sensorfwd neu – nur wenn das Gerät
+    `android.hardware.sensor.stepcounter` meldet und sensorfw noch keinen
+    Adapter dafür kennt. Beim Entfernen der App kommt die Datei wieder weg.
   * **N9/N950:** nur Beschleunigungssensor (lis3lv02d), 20 Hz über
     QtMobility mit `alwaysOn` – sensord liefert damit auch bei dunklem
     Bildschirm. Liegt das Telefon 30 s still, misst er mit 5 Hz, und
@@ -96,12 +103,13 @@ Build-Skripte holen sie aus der **eigenen** APK, wenn sie da ist
     python3 tools/apk-vorlage.py    # build/vorlage/: Schrift, Foto
 
 Ohne APK gibt es ein eigenes Symbol (Fußabdrücke) und die Systemschrift.
+Das Symbol hat auf beiden Systemen die Harmattan-Form (Superellipse).
 
 ## Bauen
 
     tools/build-meego.sh            # N9: Rust-Dienst, Schrittdienst, Oberfläche
-    meego/build-deb.sh 0.2.1        # -> build/wienzufuss_0.2.1_armel.deb
-    tools/build-sailfish.sh         # -> build/wienzufuss-0.2.1-1.{armv7hl,aarch64}.rpm
+    meego/build-deb.sh 0.2.2        # -> build/wienzufuss_0.2.2_armel.deb
+    tools/build-sailfish.sh         # -> build/wienzufuss-0.2.2-1.{armv7hl,aarch64}.rpm
 
 Rust und die musl-Toolchains legt `tools/toolchain.sh` unter `/tmp/rust`
 an. Das N9 baut mit MADDEs GCC 4.4.1 gegen den Harmattan-Sysroot (QtSDK),
@@ -120,18 +128,21 @@ statt Server, nie im Paket gesetzt.
 
 ## Installieren
 
-* **N9/N950:** `dpkg -i wienzufuss_0.2.1_armel.deb` (als root bzw.
+* **N9/N950:** `dpkg -i wienzufuss_0.2.2_armel.deb` (als root bzw.
   `devel-su`); der Schrittdienst startet sofort.
-* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.2.1-1.aarch64.rpm`
+* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.2.2-1.aarch64.rpm`
   (bzw. armv7hl). Gebaut gegen SailfishOS 5.1.0.11; das RPM verlangt
   glibc 2.34 und lässt sich auf Sailfish 4.x nicht installieren. Der Schrittdienst läuft danach als Benutzerdienst:
   `systemctl --user status wienzufuss-schritte`.
-  Ob das Gerät einen Hardware-Schrittzähler anbietet:
-  `grep -r step /etc/sensorfw/` (`stepcountersensor=True`).
+  Welche Quelle zählt, steht auf der Startseite der App (Hardware,
+  Beschleunigungssensor oder keine, mit Grund). Den freigeschalteten
+  Hardware-Zähler wieder ausblenden, ohne die App zu entfernen:
+  `devel-su rm /etc/sensorfw/sensord.conf.d/90-wienzufuss-schrittzaehler.conf`
+  und `devel-su systemctl restart sensorfwd`.
 
 ## Stand
 
-0.2.1 – geprüft:
+0.2.2 – geprüft:
 
 * **N950 (Hardware):** Installation, Schrittdienst (Start über D-Bus,
   Zählen bei dunklem Bildschirm, Ruhe-Umschaltung, CPU-Verbrauch),
@@ -140,7 +151,11 @@ statt Server, nie im Paket gesetzt.
   Profil, Schritte je Tag, Ranking, Bestenliste, Challenges, Gutscheine,
   Rückblick; Antwortformen in `api.md` abgeglichen.
 * **Sailfish:** alle Seiten in der echten Silica-Laufzeit des SDK unter
-  qemu; ein Sailfish-Gerät (Hardware-Schrittzähler, Kamera) noch nicht.
+  qemu.
+* **Jolla Phone 2026 (Sailfish 5.2.0.18, aarch64):** Installation; der
+  Hardware-Schrittzähler läuft nach dem Freischalten über sensorfw
+  (Sitzung, Zählen bei dunklem Bildschirm zugesagt). Gezählte Schritte
+  beim Gehen und die Kamera dort noch nicht.
 
 * **Übertragen:** echter Upload samt Nachkontrolle und stündlichem
   Hintergrundlauf; der Server ersetzt je Tag.
@@ -148,7 +163,7 @@ statt Server, nie im Paket gesetzt.
   (rund 87 % CPU, solange die Seite offen ist).
 
 Noch offen: Genauigkeit beim Gehen, Akku über den ganzen Tag, ein echtes
-Einlösen (PIN oder QR) und ein Sailfish-Gerät.
+Einlösen (PIN oder QR), Schritte und Kamera auf einem Sailfish-Gerät.
 
 ## Einlösen wie in der App
 

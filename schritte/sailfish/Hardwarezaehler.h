@@ -7,7 +7,10 @@
 // Sensor-Hub selbst -- auch wenn das Telefon schlaeft, fast ohne Akku.
 // sensorfw reicht ihn ueber den hybris-Adapter als "stepcountersensor"
 // durch, sofern die Geraetekonfiguration ihn einschaltet
-// (/etc/sensorfw/primaryuse.conf: stepcountersensor=True).
+// (/etc/sensorfw: stepcounteradaptor = hybrisstepcounteradaptor,
+// stepcountersensor=True). Manche Geraete haben ihn, blenden ihn aber aus
+// (Jolla Phone 2026) -- dann schaltet ihn das RPM frei, siehe
+// sailfish/sensorfw/.
 //
 // Statt der Client-Bibliothek von sensorfw (libsensorclient-qt5, im
 // SDK-Ziel nicht vorhanden) spricht diese Klasse das Protokoll selbst:
@@ -19,7 +22,8 @@
 //      10 s (SOCKET_CONNECTION_TIMEOUT_MS).
 //   3. /SensorManager/stepcountersensor local.StepCounterSensor:
 //      setStandbyOverride(sitzung, true), start(sitzung)
-//   4. Stand lesen: steps() -> (tu) Zeitstempel, Schritte seit Boot.
+//   4. Stand lesen: steps() -> (tu) Zeitstempel, Schritte seit Boot
+//      (Zeitstempel 0: noch keine Meldung seit dem Einschalten).
 //      Ueber den Socket kommen ausserdem Rahmen <uint32 n><n x {u64 t, u32 w}>.
 
 #include <QObject>
@@ -41,7 +45,10 @@ public:
     bool laeuft() const { return m_sitzung >= 0; }
     QString fehler() const { return m_fehler; }
 
-    // Stand ueber D-Bus, -1 bei Fehler.
+    // Stand ueber D-Bus (Schritte seit Boot), -1 bei Fehler. KEIN_WERT,
+    // solange der Sensor seit dem Einschalten nichts gemeldet hat: steps()
+    // liefert dann Zeitstempel 0 und 0 Schritte -- das ist kein Stand.
+    enum { KEIN_WERT = -2 };
     qint64 lesen();
 
 signals:
