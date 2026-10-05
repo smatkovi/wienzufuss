@@ -100,8 +100,8 @@ Ohne APK gibt es ein eigenes Symbol (Fußabdrücke) und die Systemschrift.
 ## Bauen
 
     tools/build-meego.sh            # N9: Rust-Dienst, Schrittdienst, Oberfläche
-    meego/build-deb.sh 0.1.3        # -> build/wienzufuss_0.1.3_armel.deb
-    tools/build-sailfish.sh         # -> build/wienzufuss-0.1.3-1.{armv7hl,aarch64}.rpm
+    meego/build-deb.sh 0.2.0        # -> build/wienzufuss_0.2.0_armel.deb
+    tools/build-sailfish.sh         # -> build/wienzufuss-0.2.0-1.{armv7hl,aarch64}.rpm
 
 Rust und die musl-Toolchains legt `tools/toolchain.sh` unter `/tmp/rust`
 an. Das N9 baut mit MADDEs GCC 4.4.1 gegen den Harmattan-Sysroot (QtSDK),
@@ -120,9 +120,9 @@ statt Server, nie im Paket gesetzt.
 
 ## Installieren
 
-* **N9/N950:** `dpkg -i wienzufuss_0.1.3_armel.deb` (als root bzw.
+* **N9/N950:** `dpkg -i wienzufuss_0.2.0_armel.deb` (als root bzw.
   `devel-su`); der Schrittdienst startet sofort.
-* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.1.3-1.aarch64.rpm`
+* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.2.0-1.aarch64.rpm`
   (bzw. armv7hl). Gebaut gegen SailfishOS 5.1.0.11; das RPM verlangt
   glibc 2.34 und lässt sich auf Sailfish 4.x nicht installieren. Der Schrittdienst läuft danach als Benutzerdienst:
   `systemctl --user status wienzufuss-schritte`.
@@ -131,10 +131,29 @@ statt Server, nie im Paket gesetzt.
 
 ## Stand
 
-0.1.3 – Oberfläche, Dienste und Pakete gebaut; alle Seiten mit
-Beispieldaten geprüft (N9 als Bild, Sailfish in der Silica-Laufzeit).
-Gegen den echten Server mit einem echten Konto und auf echter Hardware
-ist noch nicht geprüft – siehe Issues/Commits für den jeweiligen Stand.
+0.2.0 – geprüft:
+
+* **N950 (Hardware):** Installation, Schrittdienst (Start über D-Bus,
+  Zählen bei dunklem Bildschirm, Ruhe-Umschaltung, CPU-Verbrauch),
+  Oberfläche ohne QML-Fehler.
+* **Echtes Konto:** Anmeldung (Firebase-REST) und alle Lesebefehle –
+  Profil, Schritte je Tag, Ranking, Bestenliste, Challenges, Gutscheine,
+  Rückblick; Antwortformen in `api.md` abgeglichen.
+* **Sailfish:** alle Seiten in der echten Silica-Laufzeit des SDK unter
+  qemu; ein Sailfish-Gerät (Hardware-Schrittzähler) noch nicht.
+
+Noch offen: Genauigkeit beim Gehen, Akku über den ganzen Tag, ein echter
+Upload (ersetzen oder addieren) und ein echtes Einlösen.
+
+## Einlösen wie in der App
+
+Einlösen (PIN im Lokal) und die Bestätigung, die man vor Ort herzeigt,
+sind der Android-App nachgebaut (`meego/qml/Original*.qml`, für Sailfish
+beim Bauen übernommen): Layout, Farben, Texte, Fehlermeldungen; Schrift
+und Foto aus der eigenen APK (siehe oben). Die Bestätigung erscheint nur,
+wenn der Server das Einlösen bestätigt hat, und lässt sich nicht erneut
+aufrufen. QR-Codes kann der Client nicht lesen – im Lokal nach dem
+PIN-Code fragen.
 
 ## Lizenz
 

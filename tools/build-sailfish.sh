@@ -21,6 +21,7 @@ mkdir -p build
 # Symbole und die Vorlagen der Einloese-Seiten (siehe tools/build-meego.sh).
 python3 icons/make-icons.py
 python3 tools/apk-vorlage.py
+sh tools/sfos-original.sh
 rm -rf sailfish/qml/vorlage
 if [ -d build/vorlage ] && [ -n "$(ls build/vorlage 2>/dev/null)" ]; then
     mkdir -p sailfish/qml/vorlage

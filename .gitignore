@@ -19,3 +19,5 @@ __pycache__/
 /sailfish/icons/
 /sailfish/qml/vorlage/
 /sailfish/*.moc
+/meego/qml/vorlage
+/sailfish/qml/components/Original*.qml

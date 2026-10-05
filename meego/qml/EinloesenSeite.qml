@@ -75,7 +75,8 @@ Page {
         message: "Ein eingelöster Gutschein lässt sich nicht zurückgeben."
         acceptButtonText: "Einlösen"
         rejectButtonText: "Abbrechen"
-        onAccepted: { seite.hinweis = ""; einloesen.senden("einloesen", seite.werte()) }
+        // Eingeloest wird auf der Bestaetigungsseite (wie in der App).
+        onAccepted: { seite.hinweis = ""; pageStack.push(Qt.resolvedUrl("EingeloestOriginalSeite.qml"), { werte: seite.werte() }) }
     }
 
     SelectionDialog {

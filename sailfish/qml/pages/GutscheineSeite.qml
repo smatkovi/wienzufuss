@@ -6,6 +6,7 @@ import "../wzf.js" as W
 // Gutscheine: was es gibt, und was schon eingeloest ist.
 Page {
     id: seite
+    property bool istGutscheine: true
     property bool eingeloest: false
     property string hinweis: ""
 

@@ -173,9 +173,10 @@ Page {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Einlösen"
                     enabled: !einloesen.laeuft && seite.bereit
+                    // Eingeloest wird auf der Bestaetigungsseite (wie in der App).
                     onClicked: remorse.execute("Gutschein einlösen", function() {
                         seite.hinweis = ""
-                        einloesen.senden("einloesen", seite.werte())
+                        pageStack.push(Qt.resolvedUrl("EingeloestOriginalSeite.qml"), { werte: seite.werte() })
                     })
                 }
                 BusyIndicator {

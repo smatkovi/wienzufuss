@@ -1,7 +1,7 @@
 Name:       wienzufuss
 
 Summary:    Wien zu Fuß: Schritte zählen, Ranking, Challenges, Gutscheine (inoffiziell)
-Version:    0.1.3
+Version:    0.2.0
 Release:    1
 License:    GPLv3
 URL:        https://github.com/smatkovi/wienzufuss

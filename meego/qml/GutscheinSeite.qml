@@ -148,7 +148,8 @@ Page {
                     width: parent.width
                     visible: seite.g && !seite.eingeloest ? true : false
                     text: "Einlösen"
-                    onClicked: pageStack.push(Qt.resolvedUrl("EinloesenSeite.qml"), { g: seite.g })
+                    onClicked: pageStack.push(Qt.resolvedUrl(seite.art === "gastronomy" ? "EinloesenGastroSeite.qml"
+                                                                                       : "EinloesenSeite.qml"), { g: seite.g })
                 }
                 Text {
                     width: parent.width

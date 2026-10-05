@@ -13,7 +13,9 @@ ZIEL=${SFOS_ZIEL:-SailfishOS-5.1.0.11-aarch64}
 AUS=$WURZEL/build/sfos-probe
 mkdir -p "$AUS/heim" "$AUS/qml"
 rm -rf "$AUS/qml"/*
+sh tools/sfos-original.sh
 cp -r sailfish/qml/. "$AUS/qml/"
+[ -d build/vorlage ] && cp -r build/vorlage "$AUS/qml/vorlage"
 cp meego/qml/wzf.js "$AUS/qml/"
 [ -x sailfish/prebuilt/aarch64/wzf-dienst ] || sh tools/build-dienst.sh aarch64
 if [ ! -x "$AUS/probe" ] || [ tools/sfos-probe/probe.cpp -nt "$AUS/probe" ]; then
