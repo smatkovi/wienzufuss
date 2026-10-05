@@ -19,6 +19,7 @@
 #include <cstdio>
 
 #include "Dienst.h"
+#include "QrLeser.h"
 #include "Schrittzaehler.h"
 
 static void warten(int ms)
@@ -34,9 +35,11 @@ int main(int argc, char *argv[])
     const QStringList args = app.arguments();
     Dienst dienst(args.at(1));
     Schrittzaehler schritte;
+    QrLeser qrLeser;
     QQuickView view;
     view.rootContext()->setContextProperty(QStringLiteral("Dienst"), &dienst);
     view.rootContext()->setContextProperty(QStringLiteral("Schritte"), &schritte);
+    view.rootContext()->setContextProperty(QStringLiteral("QrLeser"), &qrLeser);
     view.rootContext()->setContextProperty(QStringLiteral("appVersion"), QStringLiteral("probe"));
     view.setSource(QUrl::fromLocalFile(args.at(2)));
     warten(1500);

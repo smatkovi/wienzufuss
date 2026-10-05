@@ -9,7 +9,11 @@ PageStackWindow {
     id: fenster
     showStatusBar: true
     initialPage: StartSeite { }
-    Component.onCompleted: theme.inverted = true
+    Component.onCompleted: {
+        theme.inverted = true
+        if (startSeite !== "")
+            pageStack.push(Qt.resolvedUrl(startSeite), { g: { id: 0, type: "gastronomy" } })
+    }
 
     // Das Profil vom Server (GET v1/user), fuer alle Seiten.
     property variant nutzer: null

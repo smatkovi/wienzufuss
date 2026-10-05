@@ -21,5 +21,6 @@ Page {
         onZurueck: pageStack.pop()
         onPinSenden: pageStack.push(Qt.resolvedUrl("EingeloestOriginalSeite.qml"),
                                     { werte: { id: seite.g.id, code: pin } })
+        onQrScannen: pageStack.push(Qt.resolvedUrl("QrScanSeite.qml"), { g: seite.g })
     }
 }

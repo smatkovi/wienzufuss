@@ -79,9 +79,9 @@ Aus, bis man es in den Einstellungen einschaltet. Dann:
   wurde, hält das Übertragen an, bis man es in der App freigibt
   (`~/.local/share/wienzufuss/sync.json`, Protokoll in `hochgeladen.log`).
 
-Ob der Server je Tag ersetzt oder addiert, ist aus der App nur
-geschlossen (sie schickt bei jedem Lauf die letzte Woche neu) – die
-Nachkontrolle fängt es ab, falls nicht.
+Am echten Server bestätigt: er **ersetzt** den Wert je Tag (102, dann 118
+geschickt – am Server stand danach 118, nicht 220). Die Nachkontrolle
+bleibt trotzdem: ändert sich das je, hält das Übertragen an.
 
 Es gibt keine Eingabe von Hand: übertragen wird nur, was gezählt wurde.
 
@@ -100,8 +100,8 @@ Ohne APK gibt es ein eigenes Symbol (Fußabdrücke) und die Systemschrift.
 ## Bauen
 
     tools/build-meego.sh            # N9: Rust-Dienst, Schrittdienst, Oberfläche
-    meego/build-deb.sh 0.2.0        # -> build/wienzufuss_0.2.0_armel.deb
-    tools/build-sailfish.sh         # -> build/wienzufuss-0.2.0-1.{armv7hl,aarch64}.rpm
+    meego/build-deb.sh 0.2.1        # -> build/wienzufuss_0.2.1_armel.deb
+    tools/build-sailfish.sh         # -> build/wienzufuss-0.2.1-1.{armv7hl,aarch64}.rpm
 
 Rust und die musl-Toolchains legt `tools/toolchain.sh` unter `/tmp/rust`
 an. Das N9 baut mit MADDEs GCC 4.4.1 gegen den Harmattan-Sysroot (QtSDK),
@@ -120,9 +120,9 @@ statt Server, nie im Paket gesetzt.
 
 ## Installieren
 
-* **N9/N950:** `dpkg -i wienzufuss_0.2.0_armel.deb` (als root bzw.
+* **N9/N950:** `dpkg -i wienzufuss_0.2.1_armel.deb` (als root bzw.
   `devel-su`); der Schrittdienst startet sofort.
-* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.2.0-1.aarch64.rpm`
+* **Sailfish (ab 5.0):** `devel-su pkcon install-local wienzufuss-0.2.1-1.aarch64.rpm`
   (bzw. armv7hl). Gebaut gegen SailfishOS 5.1.0.11; das RPM verlangt
   glibc 2.34 und lässt sich auf Sailfish 4.x nicht installieren. Der Schrittdienst läuft danach als Benutzerdienst:
   `systemctl --user status wienzufuss-schritte`.
@@ -131,7 +131,7 @@ statt Server, nie im Paket gesetzt.
 
 ## Stand
 
-0.2.0 – geprüft:
+0.2.1 – geprüft:
 
 * **N950 (Hardware):** Installation, Schrittdienst (Start über D-Bus,
   Zählen bei dunklem Bildschirm, Ruhe-Umschaltung, CPU-Verbrauch),
@@ -140,10 +140,15 @@ statt Server, nie im Paket gesetzt.
   Profil, Schritte je Tag, Ranking, Bestenliste, Challenges, Gutscheine,
   Rückblick; Antwortformen in `api.md` abgeglichen.
 * **Sailfish:** alle Seiten in der echten Silica-Laufzeit des SDK unter
-  qemu; ein Sailfish-Gerät (Hardware-Schrittzähler) noch nicht.
+  qemu; ein Sailfish-Gerät (Hardware-Schrittzähler, Kamera) noch nicht.
 
-Noch offen: Genauigkeit beim Gehen, Akku über den ganzen Tag, ein echter
-Upload (ersetzen oder addieren) und ein echtes Einlösen.
+* **Übertragen:** echter Upload samt Nachkontrolle und stündlichem
+  Hintergrundlauf; der Server ersetzt je Tag.
+* **QR-Scanner am N950:** der Sucher öffnet die Kamera und liest mit
+  (rund 87 % CPU, solange die Seite offen ist).
+
+Noch offen: Genauigkeit beim Gehen, Akku über den ganzen Tag, ein echtes
+Einlösen (PIN oder QR) und ein Sailfish-Gerät.
 
 ## Einlösen wie in der App
 
@@ -152,12 +157,21 @@ sind der Android-App nachgebaut (`meego/qml/Original*.qml`, für Sailfish
 beim Bauen übernommen): Layout, Farben, Texte, Fehlermeldungen; Schrift
 und Foto aus der eigenen APK (siehe oben). Die Bestätigung erscheint nur,
 wenn der Server das Einlösen bestätigt hat, und lässt sich nicht erneut
-aufrufen. QR-Codes kann der Client nicht lesen – im Lokal nach dem
-PIN-Code fragen.
+aufrufen.
+
+QR-Codes im Lokal liest der Client wie die App (Rahmen, danach „Code
+einlösen?“). Der Leser stammt aus dem Briar-Port für dieselben Geräte:
+quirc (`qr/quirc`, ISC) liest; am N9 liefert ein eigener GStreamer-Sucher
+das Kamerabild (`meego/src/Sucher.h`, `subdevsrc2` – das QML-Element aus
+QtMultimediaKit läuft dort nicht), unter Sailfish die Kamera aus
+QtMultimedia, dazu der ZXing-Filter der Kamera-App, wenn das Paket
+qr-filter-qml-plugin da ist.
 
 ## Lizenz
 
 GPLv3 (`COPYING`).
+
+* `qr/quirc/`: quirc von Daniel Beer, ISC-Lizenz (`qr/quirc/LICENSE`).
 
 * `dienst/certs/cacert.pem`: Mozilla-CA-Bündel von curl.se
   (https://curl.se/docs/caextract.html), MPL 2.0.

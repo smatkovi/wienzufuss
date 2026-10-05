@@ -1,18 +1,21 @@
 Name:       wienzufuss
 
 Summary:    Wien zu Fuß: Schritte zählen, Ranking, Challenges, Gutscheine (inoffiziell)
-Version:    0.2.0
+Version:    0.2.1
 Release:    1
 License:    GPLv3
 URL:        https://github.com/smatkovi/wienzufuss
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
+# Kamera fuer den QR-Scanner (QML-Import QtMultimedia)
+Requires:   qt5-qtdeclarative-import-multimedia
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Network)
+BuildRequires:  pkgconfig(Qt5Concurrent)
 BuildRequires:  pkgconfig(Qt5Sensors)
 BuildRequires:  pkgconfig(keepalive)
 BuildRequires:  desktop-file-utils

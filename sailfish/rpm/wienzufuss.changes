@@ -1,3 +1,8 @@
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.2.1-1
+- QR-Code im Lokal scannen wie in der Android-App (Rahmen, "Code
+  einloesen?"). Leser aus dem Briar-Port: quirc; Sailfish mit dem
+  ZXing-Filter der Kamera-App, wenn vorhanden.
+
 * Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.2.0-1
 - Einloesen und Bestaetigung sehen aus wie in der Android-App (Layout,
   Farben, Texte; Schrift und Foto aus der eigenen APK, nicht im Repo).

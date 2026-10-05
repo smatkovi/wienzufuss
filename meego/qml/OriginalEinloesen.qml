@@ -8,14 +8,15 @@ import QtQuick 1.1
 //
 // "PIN senden" loest nicht hier ein, sondern meldet pinSenden(): die
 // Seite "Eingeloest" fragt den Server und zeigt Erfolg oder Fehler -- wie
-// in der App.
+// in der App. "QR-Code fotografieren" meldet qrScannen(); die Plattform
+// oeffnet ihre Scanner-Seite.
 Rectangle {
     id: seite
     property real dp: Math.min(width, height) / 360
     property string vorlage: Qt.resolvedUrl("vorlage/")
-    property bool qrHinweis: false
     signal zurueck
     signal pinSenden(string pin)
+    signal qrScannen
 
     color: "#f7fbfc"
 
@@ -80,19 +81,7 @@ Rectangle {
                         width: parent.width - 32 * seite.dp
                         dp: seite.dp
                         text: "QR-Code fotografieren"
-                        onClicked: seite.qrHinweis = !seite.qrHinweis
-                    }
-                    // Eine Kamera-Erkennung gibt es in diesem Client nicht.
-                    Text {
-                        x: 16 * seite.dp
-                        width: parent.width - 32 * seite.dp
-                        visible: seite.qrHinweis
-                        horizontalAlignment: Text.AlignHCenter
-                        wrapMode: Text.WordWrap
-                        color: "#717171"
-                        font.pixelSize: 14 * seite.dp
-                        font.family: seite.schrift
-                        text: "QR-Codes kann diese App nicht lesen – bitte nach dem PIN-Code fragen."
+                        onClicked: seite.qrScannen()
                     }
                     Item { width: 1; height: 18 * seite.dp }
                 }

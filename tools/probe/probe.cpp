@@ -28,6 +28,39 @@
 
 #include "src/Dienst.h"
 
+#include <QDeclarativeItem>
+#include <QPainter>
+#include <QtDeclarative>
+
+// Steht statt des GStreamer-Suchers da (am Rechner gibt es kein subdevsrc2):
+// gleiche Schnittstelle, ein graues Feld als "Kamerabild".
+class ErsatzSucher : public QDeclarativeItem
+{
+    Q_OBJECT
+    Q_PROPERTY(bool laeuft READ laeuft NOTIFY laeuftChanged)
+    Q_PROPERTY(int drehung READ drehung WRITE setDrehung NOTIFY laeuftChanged)
+public:
+    ErsatzSucher(QDeclarativeItem *parent = 0) : QDeclarativeItem(parent), m_an(false)
+    {
+        setFlag(QGraphicsItem::ItemHasNoContents, false);
+    }
+    bool laeuft() const { return m_an; }
+    int drehung() const { return 90; }
+    void setDrehung(int) {}
+    Q_INVOKABLE bool starten() { m_an = true; emit laeuftChanged(); update(); return true; }
+    Q_INVOKABLE void weitersuchen() {}
+    Q_INVOKABLE void anhalten() { m_an = false; emit laeuftChanged(); }
+    void paint(QPainter *maler, const QStyleOptionGraphicsItem *, QWidget *)
+    {
+        maler->fillRect(boundingRect(), m_an ? QColor(70, 70, 70) : Qt::black);
+    }
+signals:
+    void gelesen(const QString &text);
+    void laeuftChanged();
+private:
+    bool m_an;
+};
+
 // Steht statt des Schrittdienstes da: eine Woche Beispielschritte.
 class ErsatzSchritte : public QObject
 {
@@ -74,12 +107,14 @@ int main(int argc, char *argv[])
         std::fprintf(stderr, "probe DIENST MAIN.QML [schritte...]\n");
         return 2;
     }
+    qmlRegisterType<ErsatzSucher>("WienZuFuss", 1, 0, "Sucher");
     Dienst dienst(args.at(1));
     ErsatzSchritte schritte;
     QDeclarativeView view;
     view.setAttribute(Qt::WA_DontShowOnScreen);
     view.engine()->rootContext()->setContextProperty(QLatin1String("Dienst"), &dienst);
     view.engine()->rootContext()->setContextProperty(QLatin1String("Schritte"), &schritte);
+    view.engine()->rootContext()->setContextProperty(QLatin1String("startSeite"), QString());
     view.setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view.resize(480, 854);
     view.setSource(QUrl::fromLocalFile(args.at(2)));

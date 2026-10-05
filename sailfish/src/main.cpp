@@ -13,6 +13,7 @@
 #include <sailfishapp.h>
 
 #include "Dienst.h"
+#include "QrLeser.h"
 #include "Schrittzaehler.h"
 
 int main(int argc, char *argv[])
@@ -24,11 +25,13 @@ int main(int argc, char *argv[])
 
     Dienst dienst(QStringLiteral(NETZDIENST));
     Schrittzaehler schritte;
+    QrLeser qrLeser;
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     QQmlContext *ctx = view->rootContext();
     ctx->setContextProperty(QStringLiteral("Dienst"), &dienst);
     ctx->setContextProperty(QStringLiteral("Schritte"), &schritte);
+    ctx->setContextProperty(QStringLiteral("QrLeser"), &qrLeser);
     ctx->setContextProperty(QStringLiteral("appVersion"), QStringLiteral(APP_VERSION));
     view->setSource(SailfishApp::pathTo(QStringLiteral("qml/wienzufuss.qml")));
     view->show();

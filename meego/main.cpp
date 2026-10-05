@@ -17,8 +17,11 @@
 #include <QInputContextFactory>
 #include <QStringList>
 
+#include <QtDeclarative>
+
 #include "src/Dienst.h"
 #include "src/Schrittzaehler.h"
+#include "src/Sucher.h"
 
 // Harmattan schreibt die Adresse des Sitzungsbusses hierhin. Ein per ssh
 // gestarteter Prozess erbt sie nicht -- ohne sie erreicht die App weder den
@@ -51,6 +54,9 @@ static void sitzungsBusSetzen()
 int main(int argc, char *argv[])
 {
     sitzungsBusSetzen();
+    // GStreamer fuer den QR-Sucher (src/Sucher.h). Scheitert es, faellt nur
+    // der Sucher aus; die Seite sagt dann, dass nach dem PIN zu fragen ist.
+    gst_init(&argc, &argv);
     QApplication app(argc, argv);
 
     // Ohne das bleibt die virtuelle Tastatur weg, sobald die ausziehbare
@@ -66,12 +72,19 @@ int main(int argc, char *argv[])
     const QString wurzel = QDir(QFileInfo(QCoreApplication::applicationFilePath())
                                 .absolutePath() + QLatin1String("/..")).absolutePath();
 
+    // Der Sucher zeichnet selbst, also ein QML-Element, keine Eigenschaft.
+    qmlRegisterType<Sucher>("WienZuFuss", 1, 0, "Sucher");
+
     Dienst dienst(wurzel + QLatin1String("/bin/wzf-dienst"));
     Schrittzaehler schritte;
 
     QDeclarativeView view;
     view.engine()->rootContext()->setContextProperty(QLatin1String("Dienst"), &dienst);
     view.engine()->rootContext()->setContextProperty(QLatin1String("Schritte"), &schritte);
+    // Zum Probieren am Geraet: WZF_START=QrScanSeite.qml oeffnet diese Seite
+    // gleich nach dem Start.
+    view.engine()->rootContext()->setContextProperty(QLatin1String("startSeite"),
+                                                     QString::fromLocal8Bit(qgetenv("WZF_START")));
     view.setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view.setSource(QUrl::fromLocalFile(wurzel + QLatin1String("/qml/main.qml")));
     view.showFullScreen();

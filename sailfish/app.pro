@@ -1,19 +1,22 @@
 TARGET = wienzufuss
 
 CONFIG += sailfishapp
-QT += dbus
+QT += dbus concurrent
 
 isEmpty(VERSION) {
-    VERSION = 0.2.0
+    VERSION = 0.2.1
 }
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += NETZDIENST=\\\"/usr/libexec/wienzufuss/wzf-dienst\\\"
 
 # Die Bruecke zum Netzdienst und zum Schrittdienst ist dieselbe wie auf dem
 # N9 (Qt 4 und Qt 5 aus einer Quelle).
-INCLUDEPATH += ../meego/src
+INCLUDEPATH += ../meego/src ../qr
 SOURCES += src/main.cpp ../meego/src/Dienst.cpp ../meego/src/Schrittzaehler.cpp
-HEADERS += ../meego/src/Dienst.h ../meego/src/Schrittzaehler.h
+HEADERS += ../meego/src/Dienst.h ../meego/src/Schrittzaehler.h src/QrLeser.h ../qr/QrLesen.h
+
+# QR-Codes im Lokal: quirc (qr/quirc, ISC), wie im Briar-Port.
+SOURCES += ../qr/quirc/quirc.c ../qr/quirc/decode.c ../qr/quirc/identify.c ../qr/quirc/version_db.c
 
 # Die Hilfsfunktionen teilen sich beide Oberflaechen.
 wzfjs.files = ../meego/qml/wzf.js

@@ -22,9 +22,12 @@ if [ ! -x "$AUS/probe" ] || [ tools/sfos-probe/probe.cpp -nt "$AUS/probe" ]; the
     "$SDK" bash -c "cd '$WURZEL' && sb2 -t '$ZIEL' sh -c '
         /usr/lib64/qt5/bin/moc meego/src/Dienst.h -o build/sfos-probe/moc_Dienst.cpp &&
         /usr/lib64/qt5/bin/moc meego/src/Schrittzaehler.h -o build/sfos-probe/moc_Schrittzaehler.cpp &&
-        g++ -std=c++11 -fPIC -O1 -Imeego/src tools/sfos-probe/probe.cpp meego/src/Dienst.cpp meego/src/Schrittzaehler.cpp \
-            build/sfos-probe/moc_Dienst.cpp build/sfos-probe/moc_Schrittzaehler.cpp -o build/sfos-probe/probe \
-            \$(pkg-config --cflags --libs Qt5Quick Qt5Qml Qt5Gui Qt5DBus Qt5Core)'" 2>&1 | grep -v "SAILFISH_SDK\|bashrc\|bash_profile\|^ *fi$\|^ *\.\.\.$\|^ *if \[\[\|branch to\|^$\|configuration bits" || true
+        /usr/lib64/qt5/bin/moc sailfish/src/QrLeser.h -o build/sfos-probe/moc_QrLeser.cpp &&
+        for q in quirc decode identify version_db; do gcc -O1 -fPIC -c qr/quirc/\$q.c -o build/sfos-probe/quirc_\$q.o || exit 1; done &&
+        g++ -std=c++11 -fPIC -O1 -Imeego/src -Isailfish/src -Iqr tools/sfos-probe/probe.cpp meego/src/Dienst.cpp meego/src/Schrittzaehler.cpp \
+            build/sfos-probe/moc_Dienst.cpp build/sfos-probe/moc_Schrittzaehler.cpp build/sfos-probe/moc_QrLeser.cpp \
+            build/sfos-probe/quirc_*.o -o build/sfos-probe/probe \
+            \$(pkg-config --cflags --libs Qt5Quick Qt5Qml Qt5Gui Qt5DBus Qt5Concurrent Qt5Core)'" 2>&1 | grep -v "SAILFISH_SDK\|bashrc\|bash_profile\|^ *fi$\|^ *\.\.\.$\|^ *if \[\[\|branch to\|^$\|configuration bits" || true
 fi
 "$SDK" bash -c "cd '$WURZEL' && sb2 -t '$ZIEL' env QT_QPA_PLATFORM=minimal QT_LOGGING_TO_CONSOLE=1 QT_LOGGING_RULES='*.debug=false;qml.debug=true' WZF_ATTRAPPE=1 HOME='$AUS/heim' \
     '$AUS/probe' '$WURZEL/sailfish/prebuilt/aarch64/wzf-dienst' '$AUS/qml/wienzufuss.qml' $(printf " '%s'" "$@")" 2>&1 \

@@ -34,6 +34,11 @@ if [ ! -x "$CXX" ]; then
     exit 0
 fi
 QTINC=$SYSROOT/usr/include/qt4
+# GStreamer 0.10 aus demselben Sysroot, fuer den QR-Sucher (meego/src/Sucher.h).
+# pkg-config wuerde auf den Bauwirt zeigen statt ins Sysroot.
+GSTINC="-I$SYSROOT/usr/include/gstreamer-0.10 -I$SYSROOT/usr/include/glib-2.0 \
+ -I$SYSROOT/usr/lib/glib-2.0/include -I$SYSROOT/usr/include/libxml2"
+CC=${CC_HARMATTAN:-$(dirname "$CXX")/arm-none-linux-gnueabi-gcc}
 CXXFLAGS="--sysroot=$SYSROOT -O2 -Wall -DQT_NO_DEBUG -I$QTINC"
 for m in QtCore QtGui QtNetwork QtDeclarative QtDBus QtSensors QtMobility; do
     CXXFLAGS="$CXXFLAGS -I$QTINC/$m"
@@ -62,13 +67,19 @@ if [ -f meego/main.cpp ]; then
         "$MOC" "$h" -o "$OBJ/moc_$(basename "$h" .h).cpp"
     done
     OBJE=""
-    for q in meego/main.cpp meego/src/*.cpp "$OBJ"/moc_Dienst.cpp "$OBJ"/moc_Schrittzaehler.cpp; do
+    for q in meego/main.cpp meego/src/*.cpp "$OBJ"/moc_Dienst.cpp "$OBJ"/moc_Schrittzaehler.cpp "$OBJ"/moc_Sucher.cpp; do
         [ -f "$q" ] || continue
         o="$OBJ/ui-$(basename "$q" .cpp).o"
-        "$CXX" $CXXFLAGS -I"$WURZEL/meego" -c "$q" -o "$o"
+        "$CXX" $CXXFLAGS $GSTINC -I"$WURZEL/meego" -I"$WURZEL/qr" -c "$q" -o "$o"
         OBJE="$OBJE $o"
     done
+    # QR: quirc, vier C-Dateien (qr/quirc, ISC).
+    for q in quirc decode identify version_db; do
+        "$CC" --sysroot="$SYSROOT" -O2 -std=gnu99 -I"$WURZEL/qr/quirc" -c "qr/quirc/$q.c" -o "$OBJ/quirc_$q.o"
+        OBJE="$OBJE $OBJ/quirc_$q.o"
+    done
     "$CXX" $LDFLAGS -o build/meego/wienzufuss $OBJE \
-        -lQtDeclarative -lQtGui -lQtDBus -lQtCore -lpthread
+        -lQtDeclarative -lQtGui -lQtDBus -lQtCore -lpthread \
+        -lgstapp-0.10 -lgstbase-0.10 -lgstreamer-0.10 -lgobject-2.0 -lglib-2.0 -lm
     echo "== wienzufuss fertig ($(stat -c %s build/meego/wienzufuss) B)"
 fi
