@@ -157,4 +157,10 @@ PIN-Code fragen.
 
 ## Lizenz
 
-GPLv3 (`COPYING`). Symbol aus der Vektorgrafik der Android-App.
+GPLv3 (`COPYING`).
+
+* `dienst/certs/cacert.pem`: Mozilla-CA-Bündel von curl.se
+  (https://curl.se/docs/caextract.html), MPL 2.0.
+* Das Symbol im Repo-Build (Fußabdrücke) ist eigen; Logo, Schrift und Foto
+  der Android-App kommen nur aus der eigenen APK und gehören den
+  jeweiligen Rechteinhabern.

@@ -26,7 +26,6 @@ Page {
     }
     property string weg: art === "gastronomy" ? "code" : (wege.length > 0 ? wege[0].wert : "")
     property string hinweis: ""
-    property var ergebnis: null
 
     Component.onCompleted: {
         if (fenster.nutzer && fenster.nutzer.email)
@@ -64,11 +63,6 @@ Page {
         return true
     }
 
-    Anfrage {
-        id: einloesen
-        onFertig: seite.ergebnis = daten
-        onFehler: if (!fenster.fehler(text)) seite.hinweis = W.fehlerText(text)
-    }
     RemorsePopup { id: remorse }
 
     SilicaFlickable {
@@ -81,37 +75,10 @@ Page {
             spacing: Theme.paddingSmall
             PageHeader { title: "Einlösen"; description: seite.g && seite.g.title ? seite.g.title : "" }
 
-            // --- Ergebnis ----------------------------------------------------
-            Column {
-                width: parent.width
-                spacing: Theme.paddingMedium
-                visible: !!seite.ergebnis
-                Hinweis { color: "#a0b436"; font.pixelSize: Theme.fontSizeLarge; text: seite.ergebnis ? "Eingelöst!" : "" }
-                Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    visible: seite.ergebnis && seite.ergebnis.code ? true : false
-                    text: seite.ergebnis && seite.ergebnis.code ? seite.ergebnis.code : ""
-                    font.pixelSize: Theme.fontSizeExtraLarge
-                    color: Theme.highlightColor
-                    wrapMode: Text.WrapAnywhere
-                }
-                Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    wrapMode: Text.WordWrap
-                    textFormat: Text.RichText
-                    text: seite.ergebnis && seite.ergebnis.redeemTextHtml ? seite.ergebnis.redeemTextHtml : ""
-                    onLinkActivated: Qt.openUrlExternally(link)
-                }
-                Button { anchors.horizontalCenter: parent.horizontalCenter; text: "Fertig"; onClicked: pageStack.pop() }
-            }
-
             // --- Eingabe -----------------------------------------------------
             Column {
                 width: parent.width
                 spacing: Theme.paddingSmall
-                visible: !seite.ergebnis
 
                 Hinweis {
                     color: Theme.secondaryHighlightColor
@@ -172,18 +139,12 @@ Page {
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Einlösen"
-                    enabled: !einloesen.laeuft && seite.bereit
+                    enabled: seite.bereit
                     // Eingeloest wird auf der Bestaetigungsseite (wie in der App).
                     onClicked: remorse.execute("Gutschein einlösen", function() {
                         seite.hinweis = ""
                         pageStack.push(Qt.resolvedUrl("EingeloestOriginalSeite.qml"), { werte: seite.werte() })
                     })
-                }
-                BusyIndicator {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    running: einloesen.laeuft
-                    visible: running
-                    size: BusyIndicatorSize.Medium
                 }
                 Hinweis { fehler: true; text: seite.hinweis }
             }

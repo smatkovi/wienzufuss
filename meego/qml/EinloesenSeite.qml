@@ -21,7 +21,6 @@ Page {
     property int stelle: -1
     property string stelleName: ""
     property string hinweis: ""
-    property variant ergebnis: null
 
     tools: ToolBarLayout {
         ToolIcon { iconId: "toolbar-back"; onClicked: pageStack.pop() }
@@ -63,12 +62,6 @@ Page {
         return true
     }
 
-    Anfrage {
-        id: einloesen
-        onFertig: seite.ergebnis = daten
-        onFehler: if (!fenster.fehler(text)) seite.hinweis = W.fehlerText(text)
-    }
-
     QueryDialog {
         id: sicher
         titleText: "Jetzt einlösen?"
@@ -94,7 +87,6 @@ Page {
         anchors.top: parent.top
         titel: "Einlösen"
         untertitel: g && g.title ? g.title : ""
-        laedt: einloesen.laeuft
     }
 
     Flickable {
@@ -109,37 +101,10 @@ Page {
             spacing: 12
             Item { width: 1; height: 8 }
 
-            // --- Ergebnis --------------------------------------------------
-            Column {
-                width: parent.width
-                spacing: 10
-                visible: seite.ergebnis ? true : false
-                Text { text: "Eingelöst!"; color: "#a0b436"; font.pixelSize: 30 }
-                Text {
-                    width: parent.width
-                    visible: seite.ergebnis && seite.ergebnis.code ? true : false
-                    text: seite.ergebnis && seite.ergebnis.code ? seite.ergebnis.code : ""
-                    color: "white"
-                    font.pixelSize: 36
-                    wrapMode: Text.WrapAnywhere
-                }
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    textFormat: Text.RichText
-                    color: "white"
-                    font.pixelSize: 22
-                    text: seite.ergebnis && seite.ergebnis.redeemTextHtml ? seite.ergebnis.redeemTextHtml : ""
-                    onLinkActivated: Dienst.oeffnen(link)
-                }
-                Button { width: parent.width; text: "Fertig"; onClicked: pageStack.pop() }
-            }
-
             // --- Eingabe ---------------------------------------------------
             Column {
                 width: parent.width
                 spacing: 12
-                visible: !seite.ergebnis
 
                 Text {
                     width: parent.width
@@ -200,7 +165,7 @@ Page {
                 Button {
                     width: parent.width
                     text: "Einlösen"
-                    enabled: !einloesen.laeuft && seite.bereit()
+                    enabled: seite.bereit()
                     onClicked: sicher.open()
                 }
                 Text {
