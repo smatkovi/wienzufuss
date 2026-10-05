@@ -1,0 +1,18 @@
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.1.3-1
+- Am echten Konto geprueft: Gutscheine zeigen, ob die Punkte reichen;
+  Rueckblick zeigt die drei besten und ruhigsten Tage (Format date1..3);
+  Bilder werden nur in Anzeigegroesse dekodiert.
+
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.1.2-1
+- Beschleunigungssensor: liegt das Telefon 30 s still, misst er mit 5 statt
+  20 Hz; sensord buendelt je zehn Messungen. Am N950: 0,4 statt 3,5 %
+  eines Kerns in Ruhe.
+
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.1.1-1
+- Schrittdienst protokolliert, ob sensorfw den Standby-Override annimmt.
+
+* Mon Oct 05 2026 Sebastian Matkovich <sebastian.matkovich@gmail.com> - 0.1.0-1
+- Erste Fassung: Anmeldung (E-Mail/Passwort), Schritte zaehlen
+  (Hardware-Schrittzaehler ueber sensorfw, Beschleunigungssensor als
+  Ersatz), Uebertragen ohne kleinere Werte am Server, Ranking,
+  Challenges, Gutscheine, Jahresrueckblick.

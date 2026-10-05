@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Wien zu Fuß
+Comment=Schritte zählen, Ranking, Challenges und Gutscheine
+# Kein invoker: dessen Booster will ein Binary, das sich als Bibliothek
+# laden laesst ("cannot dynamically load executable").
+Exec=/opt/wienzufuss/bin/wienzufuss
+# Voller Pfad, nicht der Themenname: sonst malt der Starter ein Ersatzquadrat.
+Icon=/usr/share/icons/hicolor/80x80/apps/wienzufuss.png
+X-Window-Icon=
+X-HildonDesk-ShowInToolbar=true
+X-Osso-Type=application/x-executable

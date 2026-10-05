@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.smatkovi.WienZuFuss.Schritte
+Exec=/usr/libexec/wienzufuss/wzf-schritte
+SystemdService=wienzufuss-schritte.service

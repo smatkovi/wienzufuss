@@ -1,0 +1,21 @@
+/build/
+/dienst/target/
+/sailfish/RPMS/
+/sailfish/prebuilt/
+*.o
+*.rpm
+*.deb
+__pycache__/
+/sailfish/.obj-*/
+/sailfish/.moc-*/
+/sailfish/Makefile*
+/sailfish/wienzufuss
+/sailfish/wzf-schritte
+/sailfish/.qmake.stash
+/sailfish/documentation.list
+# Beim Bauen erzeugt (icons/make-icons.py, tools/apk-vorlage.py) -- das
+# Logo, die Schrift und das Foto der Android-App gehoeren nicht ins Repo.
+/meego/icons/
+/sailfish/icons/
+/sailfish/qml/vorlage/
+/sailfish/*.moc

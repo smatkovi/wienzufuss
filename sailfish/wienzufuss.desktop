@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=wienzufuss
+Exec=wienzufuss
+Name=Wien zu Fuß
+Comment=Schritte zählen, Ranking, Challenges und Gutscheine (inoffiziell)
+
+# Kein Sandkasten: die App startet den Netzdienst als Kindprozess, liest
+# die Schritte unter ~/.local/share/wienzufuss und spricht den
+# Schrittdienst auf dem Sitzungsbus an.
+[X-Sailjail]
+Sandboxing=Disabled

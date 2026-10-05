@@ -1,0 +1,15 @@
+Package: wienzufuss
+Version: @VERSION@
+Section: user/other
+Priority: optional
+Architecture: armel
+Depends: libqt4-declarative, libqt4-gui, libqt4-dbus, libqtm-sensors, qt-components
+Maintainer: Sebastian Matkovich <sebastian.matkovich@gmail.com>
+Description: Wien zu Fuss fuer das N9 und N950 (inoffiziell)
+ Zaehlt Schritte mit dem Beschleunigungssensor, auch bei dunklem
+ Bildschirm, und uebertraegt sie auf Wunsch an Wien zu Fuss. Ranking,
+ Challenges, Gutscheine und Jahresrueckblick wie in der Android-App.
+ Inoffizieller Client, nicht von der Stadt Wien.
+Maemo-Display-Name: Wien zu Fuß
+XB-Maemo-Icon-26:
+@ICON@

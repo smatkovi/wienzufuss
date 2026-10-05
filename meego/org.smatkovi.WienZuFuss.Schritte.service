@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.smatkovi.WienZuFuss.Schritte
+Exec=/bin/sh -c "mkdir -p /home/user/.cache/wienzufuss && exec /opt/wienzufuss/bin/wzf-schritte >> /home/user/.cache/wienzufuss/schritte.log 2>&1"

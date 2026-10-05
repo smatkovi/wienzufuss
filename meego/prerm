@@ -1,0 +1,9 @@
+#!/bin/sh
+# Vor dem Entfernen: Anstossjob und Dienste beenden. Die gezaehlten
+# Schritte unter ~/.local/share/wienzufuss bleiben.
+if [ -x /sbin/initctl ]; then
+    /sbin/initctl stop apps/wienzufuss-schritte >/dev/null 2>&1 || true
+fi
+killall wienzufuss >/dev/null 2>&1 || true
+killall wzf-schritte >/dev/null 2>&1 || true
+exit 0

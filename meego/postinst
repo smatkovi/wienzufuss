@@ -1,0 +1,22 @@
+#!/bin/sh
+# Nach dem Auspacken: alte Instanzen abloesen, den Schrittdienst starten.
+#
+# killall, nicht pkill -x: das pkill des Busybox kennt -x nicht. Der
+# Schrittdienst sichert bei SIGTERM, bevor er endet.
+killall wienzufuss >/dev/null 2>&1 || true
+killall wzf-schritte >/dev/null 2>&1 || true
+sleep 1
+
+# Den Schrittdienst gleich wieder hochziehen, nicht erst beim naechsten
+# Anmelden. Nicht ueber initctl (scheitert aus dem dpkg-Kontext still),
+# sondern wie der Anstossjob ueber den Sitzungsbus: so laeuft er als
+# "user".
+BUS=$(sed -n 's/.*DBUS_SESSION_BUS_ADDRESS=//p' /tmp/session_bus_address.user 2>/dev/null \
+      | tr -d '";' | head -1)
+if [ -n "$BUS" ]; then
+    DBUS_SESSION_BUS_ADDRESS="$BUS" dbus-send --session --print-reply \
+        --dest=org.freedesktop.DBus /org/freedesktop/DBus \
+        org.freedesktop.DBus.StartServiceByName \
+        string:org.smatkovi.WienZuFuss.Schritte uint32:0 >/dev/null 2>&1 || true
+fi
+exit 0
