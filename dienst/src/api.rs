@@ -474,6 +474,16 @@ pub fn bearbeiten(k: &Kontext, befehl: &str, werte: &Value) -> Result<Value, Str
             k.backend("GET", &pfad, None)
         }
 
+        // Was die Webseite ankuendigt und noch nicht in der App steht.
+        // Bewusst getrennt von "challenges": das hier ist gelesene
+        // Webseite, keine Schnittstelle -- und wirft nie einen Fehler,
+        // sonst blockiert ein Umbau der Seite die ganze Liste.
+        "ankuendigungen" => {
+            let gutscheine = k.backend("GET", "v1/voucher", None)
+                .unwrap_or_else(|_| json!([]));
+            Ok(crate::ankuendigung::ankuendigungen(&k.netz, &gutscheine))
+        }
+
         "challenges" => {
             let mut v = k.backend("GET", "v1/challenge", None)?;
             html_ergaenzen(&mut v);

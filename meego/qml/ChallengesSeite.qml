@@ -12,8 +12,14 @@ Page {
         ToolIcon { iconId: "toolbar-refresh"; onClicked: laden.senden("challenges", {}) }
     }
 
-    Component.onCompleted: laden.senden("challenges", {})
+    Component.onCompleted: { laden.senden("challenges", {}); angekuendigt.senden("ankuendigungen", {}) }
     onStatusChanged: if (status === PageStatus.Active && liste.count > 0) laden.senden("challenges", {})
+
+    // Die Schnittstelle listet unter v1/challenge nur, was laeuft. Was
+    // erst naechste Woche beginnt, steht nur auf der Webseite -- das
+    // holt der Dienst getrennt und zieht ab, was schon als Gutschein
+    // in der App steht.
+    property variant ankuendigungen: []
 
     function eintragen(gruppe, l) {
         if (!l)
@@ -26,7 +32,31 @@ Page {
                 titel: c.title ? String(c.title) : "Challenge",
                 zeitraum: (c.from ? W.datum(c.from) : "") + (c.to ? " – " + W.datum(c.to) : ""),
                 bild: c.imageUrl ? String(c.imageUrl) : "",
-                dabei: c.hasJoined === true
+                dabei: c.hasJoined === true,
+                text: ""
+            })
+        }
+    }
+
+    Anfrage {
+        id: angekuendigt
+        // Lesehilfe, keine Schnittstelle: scheitert sie, bleibt der
+        // Abschnitt leer und die Seite laeuft weiter.
+        onFertig: { seite.ankuendigungen = daten ? daten : []; seite.ankuendigungEintragen() }
+        onFehler: seite.ankuendigungen = []
+    }
+
+    function ankuendigungEintragen() {
+        for (var i = 0; i < seite.ankuendigungen.length; ++i) {
+            var a = seite.ankuendigungen[i]
+            liste.append({
+                gruppe: "Angekündigt",
+                cid: 0,
+                titel: a.titel ? String(a.titel) : "",
+                zeitraum: "noch nicht in der App",
+                bild: "",
+                dabei: false,
+                text: a.text ? String(a.text) : ""
             })
         }
     }
@@ -39,6 +69,7 @@ Page {
             eintragen("Meine Challenges", daten.joined)
             eintragen("Aktuelle Challenges", daten.available)
             eintragen("Vergangene Challenges", daten.closed)
+            seite.ankuendigungEintragen()
             if (liste.count === 0)
                 seite.hinweis = "Derzeit gibt es keine Challenges."
         }
@@ -104,7 +135,14 @@ Page {
             MouseArea {
                 id: maus
                 anchors.fill: parent
-                onClicked: pageStack.push(Qt.resolvedUrl("ChallengeSeite.qml"), { cid: cid, titel: titel })
+                // Angekuendigtes hat noch keine Challenge-Kennung; dort gibt
+                // es nur den Text der Webseite zu lesen.
+                onClicked: {
+                    if (cid > 0)
+                        pageStack.push(Qt.resolvedUrl("ChallengeSeite.qml"), { cid: cid, titel: titel })
+                    else
+                        pageStack.push(Qt.resolvedUrl("AnkuendigungSeite.qml"), { titel: titel, text: text })
+                }
             }
         }
     }

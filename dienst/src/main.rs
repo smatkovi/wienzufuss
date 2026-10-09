@@ -12,6 +12,7 @@
 //!   Hintergrund auf.
 
 mod ablage;
+mod ankuendigung;
 mod api;
 mod attrappe;
 mod einstellungen;
